@@ -80,12 +80,15 @@ class GoogleTrends
 
     public function getTrends()
     {
+        $g_tld = Config::getGoogle('tld');
+        $g_geo = Config::getGoogle('geo');
+
         foreach ($this->keywords as $k_no => $row) {
             $search_string = urlencode($row['keyword']);
             echo "Getting trends for: '" . $search_string . "'\n";
 
             #do curl:
-            $config['url'] = 'http://www.google.de/trends/trendsReport?q=' . $search_string . '&geo=DE';
+            $config['url'] = 'http://www.google.' . $g_tld . '/trends/trendsReport?q=' . $search_string . '&geo=' . $g_geo;
             $body = SingleCurl::action($config);
             echo " -> " . $config['url'] . "\n";
 

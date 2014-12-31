@@ -1,16 +1,19 @@
 <?php
-class GoogleRanks {
+
+class GoogleRanks
+{
     public $dbo, $proxy_query, $proxies, $sites, $final_array;
 
-    function __construct() {
+    function __construct()
+    {
         $this->dbo = new DbHandle();
 
         // defaults:
         $this->final_array = array();
 
         // queries:
-        $this->proxy_query = "SELECT * FROM proxy WHERE google_blocked = 0 ORDER BY random()".'';
-        $this->sites_query = 'SELECT unique_id,site_url,url_com,news_link,video_link,shop_link,url_local FROM crawled_sites WHERE page_rank IS NULL LIMIT 10'.'';
+        $this->proxy_query = "SELECT * FROM proxy WHERE google_blocked = 0 ORDER BY random()";
+        $this->sites_query = 'SELECT unique_id,site_url,url_com,news_link,video_link,shop_link,url_local FROM crawled_sites WHERE page_rank IS NULL LIMIT 10';
 
         // get needed data:
         $this->proxies = $this->dbo->getProxies($this->proxy_query);
@@ -20,14 +23,16 @@ class GoogleRanks {
         $this->startWorkflow();
     }
 
-    function __destruct() {
+    function __destruct()
+    {
         /* more or less needed, let's close the db connection: */
         $this->dbo->end_connection();
     }
 
-    public function startWorkflow() {
+    public function startWorkflow()
+    {
         if (count($this->sites) == 0) {
-            echo ('No un-crawled sites.'."\n");
+            echo('No un-crawled sites.' . "\n");
             return false;
         }
 
@@ -43,7 +48,7 @@ class GoogleRanks {
 
         $count = 0;
         // condition: as long as the final array has different no of elements than $urls array AND also we still have (enough proxies) proxy :
-        echo "Parsing.. ".count($this->sites)."\n";
+        echo "Parsing.. " . count($this->sites) . "\n";
 
         while ($this->countInnerFinalArray() != count($urls) AND count($this->proxies) > 0) {
             echo " Session #" . $count . " | proxies: #" . count($this->proxies) . " | status: " . $this->countInnerFinalArray() . " = " . count($urls) . "?\n";
@@ -78,7 +83,7 @@ class GoogleRanks {
 
             $all = array();
             foreach ($this->final_array as $key => $value) {
-                $query = 'UPDATE crawled_sites SET '.'';
+                $query = 'UPDATE crawled_sites SET ' . '';
                 $q = array();
 
                 foreach ($this->getToUpdateFieldNames() as $f_key => $f_value) {
@@ -101,9 +106,10 @@ class GoogleRanks {
     }
 
     // REMOVES USED PROXY BLOCKED OR NOT:
-    public function removeUsedProxy($used_by_key, $response) {
-        foreach($this->proxies as $some_key => $proxy_info) {
-            if(array_key_exists('used_by_key', $proxy_info) AND $proxy_info['used_by_key'] == $used_by_key) {
+    public function removeUsedProxy($used_by_key, $response)
+    {
+        foreach ($this->proxies as $some_key => $proxy_info) {
+            if (array_key_exists('used_by_key', $proxy_info) AND $proxy_info['used_by_key'] == $used_by_key) {
                 #echo ' removing from array: '.$this->proxies[$some_key]['ip']." | returned: ".substr($response,0,10)." (..)\n";
 
                 unset($this->proxies[$some_key]);
@@ -112,7 +118,8 @@ class GoogleRanks {
     }
 
     /* table field => associated array key (fields from crawled_sites table): */
-    public function getToUpdateFieldNames() {
+    public function getToUpdateFieldNames()
+    {
         return array_flip(array(
             'page_rank_de' => 'page_rank',
             'pg_rank_com' => 'pg_rank_com',
@@ -138,7 +145,7 @@ class GoogleRanks {
             $this->final_array[$unique_id][$field] = $page_rank;
         }
 
-        if(strlen(trim($response)) == 0 OR stripos($response, 'href') !== false) {
+        if (strlen(trim($response)) == 0 OR stripos($response, 'href') !== false) {
             $this->final_array[$unique_id][$field] = '-'; // <- default value
         }
 
@@ -146,7 +153,10 @@ class GoogleRanks {
         $this->removeUsedProxy($split[1], $response);
     }
 
-    public function crawlingSessions($urls) {
+    public function crawlingSessions($urls)
+    {
+        $g_tld = Config::getGoogle('tld');
+
         $rc = new RollingCurl(array($this, 'request_callback'));
         $rc->window_size = 20;
         $count = 0;
@@ -155,19 +165,19 @@ class GoogleRanks {
             list($temp_name, $temp_key) = explode('-', $key);
 
             //if the link doesn't have a ranked already:
-            if(!isset($this->proxies[$temp_key][$temp_name])) {
-                if(array_key_exists($count, $this->proxies)) {
+            if (!isset($this->proxies[$temp_key][$temp_name])) {
+                if (array_key_exists($count, $this->proxies)) {
                     //proxy for this request:
                     $proxy = $this->proxies[$count];
                     $this->proxies[$count]['used_by_key'] = $key; //<- we are saving the $key to proxy, so we could have a reference
                     //echo " ".$temp_name."-".$temp_key." using: ".$proxy['ip']."\n";
 
-                    $query = "https://toolbarqueries.google.de/tbr?client=navclient-auto&ch=" . $this->CheckHash($this->HashURL($url)) . "&features=Rank&q=info:" . $url . "&key=" . $key . "";
-                    $request = new RollingCurlRequest($query, "GET", NULL, NULL, array(
+                    $query = "https://toolbarqueries.google." . $g_tld . "/tbr?client=navclient-auto&ch=" . $this->CheckHash($this->HashURL($url)) . "&features=Rank&q=info:" . $url . "&key=" . $key . "";
+                    $request = new RollingCurlRequest($query, "GET", null, null, array(
                         CURLOPT_PROXY => $proxy['ip'],
-                        CURLOPT_PROXYUSERPWD => $proxy['username'].":".$proxy['password'],
+                        CURLOPT_PROXYUSERPWD => $proxy['username'] . ":" . $proxy['password'],
                         CURLOPT_USERAGENT => "Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.8.1.16) Gecko/20080702 Firefox/2.0.0.16",
-                        CURLOPT_HTTPPROXYTUNNEL => TRUE
+                        CURLOPT_HTTPPROXYTUNNEL => true
                     ));
 
                     //add curl:
@@ -180,7 +190,7 @@ class GoogleRanks {
         }
 
         // run curls ->
-        if($count > 0){
+        if ($count > 0) {
             $rc->execute();
         }
     }
@@ -189,9 +199,10 @@ class GoogleRanks {
      * count the results inside the $this->final_array
      * ^ this is important for looping
      * */
-    function countInnerFinalArray () {
+    function countInnerFinalArray()
+    {
         $total = 0;
-        foreach($this->final_array as $k => $inner) {
+        foreach ($this->final_array as $k => $inner) {
             $total += count($inner);
         }
 

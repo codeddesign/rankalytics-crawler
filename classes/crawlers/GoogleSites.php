@@ -14,7 +14,7 @@ class GoogleSites
 
         // settings:
         $this->max_results = 30; // number of results from google
-        $this->keywords_query = 'SELECT * FROM tbl_project_keywords'.'';
+        $this->keywords_query = 'SELECT * FROM tbl_project_keywords' . '';
 
         // settings based on type:
         switch ($this->type) {
@@ -22,8 +22,8 @@ class GoogleSites
                 $this->proxy_count_file = '/var/www/stats/proxy_cs_sites.txt';
                 $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
 
-                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='small_craw'".'');
-                if($offset >= count($r)) {
+                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='small_craw'" . '');
+                if ($offset >= count($r)) {
                     $offset = 0;
                     Helper::resetCurrentProxyCount($this->proxy_count_file);
                 }
@@ -34,8 +34,8 @@ class GoogleSites
                 $this->proxy_count_file = '/var/www/stats/proxy_cb_sites.txt';
                 $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
 
-                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='main_craw'".'');
-                if($offset >= count($r)) {
+                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='main_craw'" . '');
+                if ($offset >= count($r)) {
                     $offset = 0;
                     Helper::resetCurrentProxyCount($this->proxy_count_file);
                 }
@@ -48,7 +48,8 @@ class GoogleSites
         $this->startWorkflow();
     }
 
-    function __destruct() {
+    function __destruct()
+    {
         /* more or less needed, let's close the db connection: */
         $this->dbo->end_connection();
     }
@@ -57,7 +58,7 @@ class GoogleSites
     {
         // get stuff from db:
         $this->keywords = $this->dbo->getKeywords($this->keywords_query);
-        if(count($this->keywords) == 0) {
+        if (count($this->keywords) == 0) {
             exit();
         }
         $this->proxies = $this->dbo->getProxies($this->proxy_query);
@@ -89,6 +90,9 @@ class GoogleSites
 
     public function getSites()
     {
+        $lang = Config::getGoogle('lang');
+        $g_tld = Config::getGoogle('tld');
+
         foreach ($this->keywords as $k_no => $row) {
             // sets #1:
             $this->crawledDate = $row['crawled_date'];
@@ -97,47 +101,44 @@ class GoogleSites
 
             // sets #2:
             $search_string = urlencode($keyword);
-            $search_string_2 = urlencode('['.$keyword.' '.$location.']');
+            $search_string_2 = urlencode('[' . $keyword . ' ' . $location . ']');
 
             // sets #3:
             $initial = SingleCurl::$proxy_count;
             echo "Parsing: " . $search_string . " #with-" . $initial . " - " . SingleCurl::$proxies[SingleCurl::$proxy_count]['ip'] . " ";
 
             # search .COM
-            $lang = 'en';
-            $config['url'] = "https://www.google.com/search?q=" . $search_string . "&hl=".$lang."&start=0&num=".$this->max_results;
+            $config['url'] = "https://www.google." . $g_tld . "/search?q=" . $search_string . "&hl=" . $lang . "&start=0&num=" . $this->max_results;
             $body = SingleCurl::action($config);
-
             $result_array_com = $this->processFields($body);
 
             # search .DE (=local)
-            $lang = 'de';
+            /*$lang = 'de';
             $config['url'] = "https://www.google.de/search?q=" . $search_string . "&hl=".$lang."&start=0&num=".$this->max_results;
             $body = SingleCurl::action($config);
-
-            $result_array_de = $this->processFields($body);
+            $result_array_de = $this->processFields($body);*/
+            $result_array_de = array();
 
             # search LOCATION:
-            $config['url'] = "https://www.google.de/search?q=" . $search_string_2 . "&hl=".$lang."&start=0&num=".$this->max_results;
+            $config['url'] = "https://www.google." . $g_tld . "/search?q=" . $search_string_2 . "&hl=" . $lang . "&start=0&num=" . $this->max_results;
             $body = SingleCurl::action($config);
-
             $result_array_local = $this->processFields($body);
 
             # search NEWS:
             $tbm = 'nws';
-            $config['url'] = "https://www.google.de/search?q=" . $search_string . "&tbm=".$tbm."&hl=de&start=0&num=" . $this->max_results;
+            $config['url'] = "https://www.google." . $g_tld . "/search?q=" . $search_string . "&tbm=" . $tbm . "&hl=" . $lang . "&start=0&num=" . $this->max_results;
             $body = SingleCurl::action($config);
             $news_array = $this->getNews($body);
 
             # search VIDEO:
             $tbm = 'vid';
-            $config['url'] = "https://www.google.de/search?q=" . $search_string . "&tbm=".$tbm."&hl=de&start=0&num=" . $this->max_results;
+            $config['url'] = "https://www.google." . $g_tld . "/search?q=" . $search_string . "&tbm=" . $tbm . "&hl=" . $lang . "&start=0&num=" . $this->max_results;
             $body = SingleCurl::action($config);
             $video_array = $this->getVideos($body);
 
             # search SHOP:
             $tbm = 'shop';
-            $config['url'] = "https://www.google.de/search?q=" . $search_string . "&tbm=".$tbm."&hl=de&start=0&num=" . $this->max_results;
+            $config['url'] = "https://www.google." . $g_tld . "/search?q=" . $search_string . "&tbm=" . $tbm . "&hl=" . $lang . "&start=0&num=" . $this->max_results;
             $body = SingleCurl::action($config);
             $shop_array = $this->getShop($body);
 
@@ -167,7 +168,7 @@ class GoogleSites
             //we need this in case it ever closes:
             $difference = SingleCurl::$proxy_count - $initial;
             $increment = 1;
-            if($difference > 0) {
+            if ($difference > 0) {
                 $increment += $difference;
             }
 
@@ -197,7 +198,7 @@ class GoogleSites
 
             //update `crawledDate` - table field is not added!
             $new_date = date('Y-m-d H:i:s');
-            $query = "UPDATE \"tbl_project_keywords\" SET \"crawled_status\"='1', \"crawled_date\"='".$new_date."' WHERE \"unique_id\"='" . $row['unique_id'] . "'";
+            $query = "UPDATE \"tbl_project_keywords\" SET \"crawled_status\"='1', \"crawled_date\"='" . $new_date . "' WHERE \"unique_id\"='" . $row['unique_id'] . "'";
             $this->dbo->runQuery($query);
         }
     }
@@ -216,31 +217,25 @@ class GoogleSites
             'rank',
             'title',
             'description',
-
             'google_com_rank',
             'title_com',
             'desc_com',
             'url_com',
-
             'rank_local',
             'title_local',
             'des_local',
             'url_local',
-
             'total_records',
             'total_records_com',
             'total_records_local',
-
             'news_title',
             'news_link',
             'news_desc',
             'news_total_result',
-
             'video_title',
             'video_link',
             'video_desc',
             'video_total_result',
-
             'shop_title',
             'shop_link',
             'shop_desc',
@@ -267,31 +262,25 @@ class GoogleSites
             isset($result_array_de[$key]['rank']) ? $result_array_de[$key]['rank'] : $default,
             isset($result_array_de[$key]['title']) ? $result_array_de[$key]['title'] : $default,
             isset($result_array_de[$key]['desc']) ? $result_array_de[$key]['desc'] : $default,
-
             $value['rank'],
             $value['title'],
             $value['desc'],
             $value['site_url'],
-
             isset($result_array_local[$key]['rank']) ? $result_array_local[$key]['rank'] : $default,
             isset($result_array_local[$key]['title']) ? $result_array_local[$key]['title'] : $default,
             isset($result_array_local[$key]['desc']) ? $result_array_local[$key]['desc'] : $default,
             isset($result_array_local[$key]['site_url']) ? $result_array_local[$key]['site_url'] : $default,
-
             isset($result_array_de[$key]['total_records']) ? $result_array_de[$key]['total_records'] : $default,
             $value['total_records'],
             isset($result_array_local[$key]['total_records']) ? $result_array_local[$key]['total_records'] : $default,
-
             isset($news_array[$key]['title']) ? $news_array[$key]['title'] : $default,
             isset($news_array[$key]['link']) ? $news_array[$key]['link'] : $default,
             isset($news_array[$key]['desc']) ? $news_array[$key]['desc'] : $default,
             isset($news_array[$key]['total_result']) ? $news_array[$key]['total_result'] : $default,
-
             isset($video_array[$key]['title']) ? $video_array[$key]['title'] : $default,
             isset($video_array[$key]['link']) ? $video_array[$key]['link'] : $default,
             isset($video_array[$key]['desc']) ? $video_array[$key]['desc'] : $default,
             isset($video_array[$key]['total_result']) ? $video_array[$key]['total_result'] : $default,
-
             isset($shop_array[$key]['title']) ? $shop_array[$key]['title'] : $default,
             isset($shop_array[$key]['link']) ? $shop_array[$key]['link'] : $default,
             isset($shop_array[$key]['desc']) ? $shop_array[$key]['desc'] : $default,
@@ -305,7 +294,7 @@ class GoogleSites
         }
 
         // #2
-        foreach($values as $v_no => $val) {
+        foreach ($values as $v_no => $val) {
             $values[$v_no] = utf8_decode($val);
         }
 
@@ -319,18 +308,21 @@ class GoogleSites
         $Matched = "";
 
         foreach ($Elements as $node) {
-            if (!$node->hasAttributes())
+            if (!$node->hasAttributes()) {
                 continue;
+            }
 
             $classAttribute = $node->attributes->getNamedItem('class');
 
-            if (!$classAttribute)
+            if (!$classAttribute) {
                 continue;
+            }
 
             $classes = explode(' ', $classAttribute->nodeValue);
 
-            if (in_array($ClassName, $classes))
+            if (in_array($ClassName, $classes)) {
                 $Matched = $node->nodeValue;
+            }
         }
 
         return utf8_decode($Matched);
@@ -343,13 +335,15 @@ class GoogleSites
         $Matched = "";
 
         foreach ($Elements as $node) {
-            if (!$node->hasAttributes())
+            if (!$node->hasAttributes()) {
                 continue;
+            }
 
             $classAttribute = $node->attributes->getNamedItem('class');
 
-            if (!$classAttribute)
+            if (!$classAttribute) {
                 continue;
+            }
 
             $classes = explode(' ', $classAttribute->nodeValue);
 
@@ -371,18 +365,21 @@ class GoogleSites
         $Matched = "";
 
         foreach ($Elements as $node) {
-            if (!$node->hasAttributes())
+            if (!$node->hasAttributes()) {
                 continue;
+            }
 
             $classAttribute = $node->attributes->getNamedItem('class');
 
-            if (!$classAttribute)
+            if (!$classAttribute) {
                 continue;
+            }
 
             $classes = explode(' ', $classAttribute->nodeValue);
 
-            if (in_array($ClassName, $classes))
+            if (in_array($ClassName, $classes)) {
                 $Matched[] = $node;
+            }
         }
 
         return $Matched;
@@ -426,13 +423,14 @@ class GoogleSites
                 $nod2 = $NodList->item($j);
                 $nodemane = $nod2->nodeName;
                 $nodevalue = $nod2->nodeValue;
-                if ($nod2->nodeType == XML_TEXT_NODE)
+                if ($nod2->nodeType == XML_TEXT_NODE) {
                     $NodeContent .= $nodevalue;
-                else {
+                } else {
                     $NodeContent .= "<$nodemane ";
                     $attAre = $nod2->attributes;
-                    foreach ($attAre as $value)
+                    foreach ($attAre as $value) {
                         $NodeContent .= "{$value->nodeName}='{$value->nodeValue}'";
+                    }
                     $NodeContent .= ">";
                     $this->getContent($NodeContent, $nod2);
                     $NodeContent .= "</$nodemane>";
@@ -449,22 +447,25 @@ class GoogleSites
         } else {
             if ($node->hasAttributes()) {
                 $attributes = $node->attributes;
-                if ((!is_null($attributes)) && (count($attributes)))
-                    foreach ($attributes as $index => $attr)
+                if ((!is_null($attributes)) && (count($attributes))) {
+                    foreach ($attributes as $index => $attr) {
                         $result[$attr->name] = $attr->value;
+                    }
+                }
             }
             if ($node->hasChildNodes()) {
                 $children = $node->childNodes;
                 for ($i = 0; $i < $children->length; $i++) {
                     $child = $children->item($i);
-                    if ($child->nodeName != '#text')
-                        if (!isset($result[$child->nodeName]))
+                    if ($child->nodeName != '#text') {
+                        if (!isset($result[$child->nodeName])) {
                             $result[$child->nodeName] = $this->dom2array($child);
-                        else {
+                        } else {
                             $aux = $result[$child->nodeName];
                             $result[$child->nodeName] = array($aux);
                             $result[$child->nodeName][] = $this->dom2array($child);
                         }
+                    }
                 }
             }
         }
@@ -498,7 +499,8 @@ class GoogleSites
         return $res;
     }
 
-    function isANumber($no) {
+    function isANumber($no)
+    {
         $bad = array(',', '.');
         $no = str_replace($bad, '', $no);
 
@@ -533,17 +535,17 @@ class GoogleSites
 
             // finding total number of results
             $found = false;
-            if(preg_match('/id="resultStats">(.*?)<\/div>/', $htmdata, $matched)) {
+            if (preg_match('/id="resultStats">(.*?)<\/div>/', $htmdata, $matched)) {
                 $matched = explode(' ', $matched[1]);
-                foreach($matched as $m_no => $m) {
-                    if($this->isANumber($m)) {
+                foreach ($matched as $m_no => $m) {
+                    if ($this->isANumber($m)) {
                         $found = $m;
                         break;
                     }
                 }
             }
 
-            if($found === false) {
+            if ($found === false) {
                 $total_result = 0;
             } else {
                 $total_result = $found;
@@ -571,10 +573,12 @@ class GoogleSites
                     continue; // skipping non-search results
                 }
 
-                if (isset($ar['div'][1]))
+                if (isset($ar['div'][1])) {
                     $ar['div'] =& $ar['div'][0];
-                if (isset($ar['div'][1]))
+                }
+                if (isset($ar['div'][1])) {
                     $ar['div'] =& $ar['div'][0];
+                }
 
 
                 $divs = $list->getElementsByTagName('span');
@@ -596,7 +600,9 @@ class GoogleSites
                     {
                         continue;
                     }
-                    if (strstr($ar['h3']['a']['@attributes']['href'], "interstitial")) echo "!";
+                    if (strstr($ar['h3']['a']['@attributes']['href'], "interstitial")) {
+                        echo "!";
+                    }
 
                     $tmp = parse_url($result['url']);
 
@@ -606,12 +612,14 @@ class GoogleSites
                     if (strstr($cont, "<b >...</b><br >")) // remove some dirt behind the description
                     {
                         $result['desc'] = substr($cont, 0, strpos($cont, "<b >...</b><br >"));
-                    } else
+                    } else {
                         if (strstr($cont, "<cite")) // remove some dirt behind the description in case the description was short
                         {
                             $result['desc'] = substr($cont, 0, strpos($cont, "<span class='f'><cite"));
-                        } else
+                        } else {
                             $result['desc'] = $cont;
+                        }
+                    }
 
                     //Making id (Infine db wont support autoincrement and primarykeys)
                     $count++;
@@ -627,7 +635,7 @@ class GoogleSites
     {
         preg_match_all('/Ungefähr.*?Ergebnisse/i', $data, $matches, PREG_PATTERN_ORDER);
 
-        if(isset($matches[0][0])) {
+        if (isset($matches[0][0])) {
             $matches = explode(" ", $matches[0][0]);
             $total_result = str_replace(",", "", $matches[1]);
         } else {
@@ -671,7 +679,7 @@ class GoogleSites
     {
         preg_match_all('/Ungefähr.*?Ergebnisse/i', $data, $matches, PREG_PATTERN_ORDER);
 
-        if(isset($matches[0][0])) {
+        if (isset($matches[0][0])) {
             $matches = explode(" ", $matches[0][0]);
             $total_result = str_replace(",", "", $matches[1]);
         } else {
