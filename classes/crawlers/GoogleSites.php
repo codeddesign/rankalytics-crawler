@@ -21,30 +21,26 @@ class GoogleSites extends CrawlerBase
         // settings based on type:
         switch ($this->type) {
             case 'rankalytics_crawler':
-                $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cs_sites.txt';
-                $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
-
-                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='small_craw'");
-                if ($offset >= count($r)) {
-                    $offset = 0;
-                    Helper::resetCurrentProxyCount($this->proxy_count_file);
-                }
-
-                $this->proxy_query = "SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='small_craw' LIMIT 999999 OFFSET " . $offset;
+                $f_name = 'proxy_cs_sites';
+                $for_crawler = 'small_craw';
                 break;
             default:
-                $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cb_sites.txt';
-                $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
-
-                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='main_craw'");
-                if ($offset >= count($r)) {
-                    $offset = 0;
-                    Helper::resetCurrentProxyCount($this->proxy_count_file);
-                }
-
-                $this->proxy_query = "SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='main_craw' LIMIT 999999 OFFSET " . $offset;
+                $f_name = 'proxy_cb_sites';
+                $for_crawler = 'main_craw';
                 break;
         }
+
+        $this->proxy_count_file = $this->config['prj_path'] . '/stats/' . $f_name . '.txt';
+        $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
+
+        // ..
+        $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='" . $for_crawler . "'");
+        if ($offset >= count($r)) {
+            $offset = 0;
+            Helper::resetCurrentProxyCount($this->proxy_count_file);
+        }
+
+        $this->proxy_query = "SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='" . $for_crawler . "' LIMIT 999999 OFFSET " . $offset;
 
         // ->
         $this->startWorkflow();

@@ -157,7 +157,7 @@ class GoogleRanks extends CrawlerBase
 
     public function crawlingSessions($urls)
     {
-        $g_tld = Config::getGoogle('tld');
+        $g_tld = $this->config['google_tld'];
 
         $rc = new RollingCurl(array($this, 'request_callback'));
         $rc->window_size = 20;
@@ -276,5 +276,4 @@ class GoogleRanks extends CrawlerBase
         }
         return $Check;
     }
-
 }

@@ -21,15 +21,17 @@ class GoogleTrends extends CrawlerBase
         // settings based on type:
         switch ($this->type) {
             case 'rankalytics_crawler':
-                $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cs_trends.txt';
-                $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
+                $f_name = 'proxy_cs_trends';
                 break;
             default:
-                $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cb_trends.txt';
-                $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
+                $f_name = 'proxy_cb_trends';
                 break;
         }
 
+        $this->proxy_count_file = $this->config['prj_path'] . '/stats/'.$f_name.'.txt';
+        $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
+
+        // ..
         $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0'");
         if ($offset >= count($r)) {
             $offset = 0;
