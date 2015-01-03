@@ -1,13 +1,19 @@
 <?php
 include 'auto_load.php';
 
-if (!isset($_GET['projectId'])) {
-    exit('no project id!');
-} else {
+if (isset($_GET['projectId'])) {
     $project_id = trim($_GET['projectId']);
 }
 
+if (isset($argv[1])) {
+    $project_id = trim($argv[1]);
+}
 
-shell_exec("php " . $config['prj_path'] . "/adword_api/examples/AdWords/v201402/Optimization/NewKeywordAdowordSave.php " . $project_id . ' > /dev/null 2 &');
+if (!isset($project_id) or trim($project_id) == '') {
+    exit('no project id provided!');
+}
+
+$t_cmd = "php " . $config['prj_path'] . "/adword_api/examples/AdWords/v201402/Optimization/NewKeywordAdowordSave.php " . $project_id . ' > /dev/null 2 &';
+shell_exec($t_cmd);
 
 echo 'startead getting adwords info..';

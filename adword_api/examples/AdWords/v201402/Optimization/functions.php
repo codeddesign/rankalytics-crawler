@@ -1,5 +1,5 @@
 <?php
-function EstimateKeywordTrafficExample(AdWordsUser $user, $projectId, $keywordCount)
+function EstimateKeywordTrafficExample(AdWordsUser $user, $projectId, $keywordCount, $config)
 {
     //default pre-sets:
     $keywords = $result_array = $update_array_array = array();
@@ -10,7 +10,7 @@ function EstimateKeywordTrafficExample(AdWordsUser $user, $projectId, $keywordCo
     // Create keywords. Up to 2000 keywords can be passed in a single request.
     /*mysql_query("set max_length_for_sort_data = 2048");*/ // ?
 
-    $dbo = new DbHandle();
+    $dbo = new DbHandle($config);
     $temp_keywords = $dbo->getResults("SELECT * FROM \"tbl_project_keywords\" WHERE length(keyword)< 80 AND project_id='" . $projectId . "' ORDER BY \"uploadedOn\" desc");
     unset($dbo);
 
@@ -42,7 +42,7 @@ function EstimateKeywordTrafficExample(AdWordsUser $user, $projectId, $keywordCo
         $keywordEstimateRequest = new KeywordEstimateRequest();
         $keywordEstimateRequest->keyword = $negativeKeyword;
 
-        $keywordEstimateRequest->isNegative = TRUE;
+        $keywordEstimateRequest->isNegative = true;
         $keywordEstimateRequests[] = $keywordEstimateRequest;
     }
 
@@ -111,17 +111,17 @@ function EstimateKeywordTrafficExample(AdWordsUser $user, $projectId, $keywordCo
             $keyword_info[$i]['cpc'] = $meanAverageCpc;
 
             //print_r($keyword_info[$i]);
-            insert_into_table($keyword_info[$i]);
+            insert_into_table($keyword_info[$i], $config);
         }
     }
 }
 
-function insert_into_table($data_array)
+function insert_into_table($data_array, $config)
 {
     $insert_query = "INSERT INTO project_keywords_adwordinfo (keyword_id,keyword,\"CPC\",volume,competition,created_on) VALUES
     ('" . $data_array['keyword_id'] . "','" . $data_array['keyword'] . "','" . $data_array['cpc'] . "','" . $data_array['volume'] . "','" . $data_array['competition'] . "', now() )";
 
-    $dbo = new DbHandle();
+    $dbo = new DbHandle($config);
     $r = $dbo->runQuery($insert_query);
     unset($dbo);
 

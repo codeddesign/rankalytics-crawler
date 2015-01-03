@@ -2,7 +2,7 @@
 /*if (!isset($_SESSION)) {
     session_start();
 }*/
-include __DIR__.'/../../../../../auto_load.php';
+include __DIR__ . '/../../../../../auto_load.php';
 
 /* include needed files: */
 require_once dirname(dirname(__FILE__)) . '/init.php';
@@ -22,7 +22,7 @@ try {
     $user->LogAll();
 
     // Run the example.
-    EstimateKeywordTrafficExample($user, $projectId, $keywordCount);
+    EstimateKeywordTrafficExample($user, $projectId, $keywordCount, $config);
 } catch (Exception $e) {
     printf("An error has occurred: %s\n", $e->getMessage());
     echo "<br/>";
