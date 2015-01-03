@@ -85,7 +85,7 @@ class GoogleRanks extends CrawlerBase
 
             $all = array();
             foreach ($this->final_array as $key => $value) {
-                $query = 'UPDATE crawled_sites SET ' . '';
+                $query = 'UPDATE crawled_sites SET ';
                 $q = array();
 
                 foreach ($this->getToUpdateFieldNames() as $f_key => $f_value) {

@@ -16,7 +16,7 @@ class GoogleSites extends CrawlerBase
 
         // settings:
         $this->max_results = 30; // number of results from google
-        $this->keywords_query = 'SELECT * FROM tbl_project_keywords' . '';
+        $this->keywords_query = 'SELECT * FROM tbl_project_keywords';
 
         // settings based on type:
         switch ($this->type) {
@@ -24,7 +24,7 @@ class GoogleSites extends CrawlerBase
                 $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cs_sites.txt';
                 $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
 
-                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='small_craw'" . '');
+                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='small_craw'");
                 if ($offset >= count($r)) {
                     $offset = 0;
                     Helper::resetCurrentProxyCount($this->proxy_count_file);
@@ -36,7 +36,7 @@ class GoogleSites extends CrawlerBase
                 $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cb_sites.txt';
                 $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
 
-                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='main_craw'" . '');
+                $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='main_craw'");
                 if ($offset >= count($r)) {
                     $offset = 0;
                     Helper::resetCurrentProxyCount($this->proxy_count_file);

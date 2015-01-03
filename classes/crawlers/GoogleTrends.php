@@ -16,7 +16,7 @@ class GoogleTrends extends CrawlerBase
 
         // settings:
         $this->max_results = 30; // number of results from google
-        $this->keywords_query = 'SELECT * FROM tbl_project_keywords' . '';
+        $this->keywords_query = 'SELECT * FROM tbl_project_keywords';
 
         // settings based on type:
         switch ($this->type) {
@@ -30,7 +30,7 @@ class GoogleTrends extends CrawlerBase
                 break;
         }
 
-        $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0'" . '');
+        $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0'");
         if ($offset >= count($r)) {
             $offset = 0;
             Helper::resetCurrentProxyCount($this->proxy_count_file);
