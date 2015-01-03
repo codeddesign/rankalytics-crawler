@@ -1,13 +1,15 @@
 <?php
 
-class GoogleTrends
+class GoogleTrends extends CrawlerBase
 {
     public $dbo, $type, $proxy_query, $keywords, $proxies, $crawledDate;
 
-    function __construct($type)
+    function __construct($type, $config)
     {
+        parent::__construct($config);
+
         // init db:
-        $this->dbo = new DbHandle();
+        $this->dbo = new DbHandle($config);
 
         // set type:
         $this->type = $type;
@@ -19,11 +21,11 @@ class GoogleTrends
         // settings based on type:
         switch ($this->type) {
             case 'rankalytics_crawler':
-                $this->proxy_count_file = '/var/www/stats/proxy_cs_trends.txt';
+                $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cs_trends.txt';
                 $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
                 break;
             default:
-                $this->proxy_count_file = '/var/www/stats/proxy_cb_trends.txt';
+                $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cb_trends.txt';
                 $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
                 break;
         }
@@ -80,8 +82,8 @@ class GoogleTrends
 
     public function getTrends()
     {
-        $g_tld = Config::getGoogle('tld');
-        $g_geo = Config::getGoogle('geo');
+        $g_tld = $this->config['google_tld'];
+        $g_geo = $this->config['google_geo'];
 
         foreach ($this->keywords as $k_no => $row) {
             $search_string = urlencode($row['keyword']);

@@ -7,10 +7,11 @@
 
 class SingleCurl
 {
-    public static $proxies, $proxy_count, $checkBlocking = TRUE, $fileName, $dbo;
+    public static $proxies, $proxy_count, $checkBlocking = true, $fileName, $dbo;
 
     /* this function takes of crawler, so that in case the proxy list is finished => sleeping */
-    public static function checkProxyExistence() {
+    public static function checkProxyExistence()
+    {
         //if we are out of proxies in this current session:
         if (!array_key_exists(static::$proxy_count, static::$proxies)) {
             echo "No more not-blocked proxies in this list/offset.\n";
@@ -18,7 +19,7 @@ class SingleCurl
             echo "- Reset proxy index\n";
             static::$proxy_count = 0;
 
-            echo '- Reset file content'."\n";
+            echo '- Reset file content' . "\n";
             Helper::resetCurrentProxyCount(static::$fileName);
 
             $sleep_time = rand(25, 59);
@@ -59,7 +60,7 @@ class SingleCurl
         curl_setopt($ch, CURLOPT_PROXY, $proxy['ip']);
         if (trim($proxy['username']) != "" AND trim($proxy['password']) != "") {
             curl_setopt($ch, CURLOPT_PROXYUSERPWD, trim($proxy['username']) . ':' . trim($proxy['password']));
-            curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, TRUE);
+            curl_setopt($ch, CURLOPT_HTTPPROXYTUNNEL, true);
         }
 
         $data = curl_exec($ch);

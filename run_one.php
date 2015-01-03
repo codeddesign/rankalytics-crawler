@@ -1,8 +1,8 @@
 <?php
 set_time_limit(0);
 
-/* Load all classes */
-require_once 'auto_load.php';
+/* Load all classes & config */
+include 'auto_load.php';
 
 /* TESTS */
 if ((!isset($_GET['p']) and !isset($_GET['type'])) OR isset($argv[1])) {
@@ -20,15 +20,15 @@ if ((!isset($_GET['p']) and !isset($_GET['type'])) OR isset($argv[1])) {
 while (1) {
     switch ($p) {
         case 'sites':
-            $obj = new GoogleSites($type);
+            $obj = new GoogleSites($type, $config);
             unset($obj);
             break;
         case 'ranks':
-            $obj = new GoogleRanks();
+            $obj = new GoogleRanks($type, $config);
             unset($obj);
             break;
         case 'trends':
-            $obj = new GoogleTrends($type);
+            $obj = new GoogleTrends($type, $config);
             unset($obj);
             break;
         default:

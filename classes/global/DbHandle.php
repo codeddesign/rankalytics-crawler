@@ -4,18 +4,10 @@ class DbHandle
 {
     protected $config, $connection;
 
-    function __construct()
+    function __construct($config)
     {
-        $config = array(
-            "host" => "178.62.169.190",
-            "port" => 5432,
-            "dbname" => "serp",
-            "user" => "phoenixkeyword",
-            "password" => "My6Celeb!!",
-        );
-
         //sets:
-        $this->config = $config;
+        $this->config = $config['pg_db'];
         $this->connection = false;
 
         //Connect:
@@ -25,18 +17,16 @@ class DbHandle
     function make_connection()
     {
         $connect_q = '';
-        foreach($this->config as $key => $value) {
-            $connect_q .= $key.'='.$value.' ';
+        foreach ($this->config as $key => $value) {
+            $connect_q .= $key . '=' . $value . ' ';
         }
 
-        if($link = pg_connect($connect_q)) {
+        if ($link = pg_connect($connect_q)) {
             $this->connection = $link;
 
-            #todo - more documentation regarding this:
             pg_query($this->connection, "SET CLIENT_ENCODING TO 'UTF8'");
-            /*echo 'DB: PostGreSQL Connected'."\n";*/
         } else {
-            exit( 'DB: PostGreSQL failed to connect'."\n" );
+            exit('DB: PostGreSQL failed to connect' . "\n");
         }
     }
 
@@ -56,7 +46,7 @@ class DbHandle
 
     public function connection_is_ok()
     {
-        if($this->connection !== false) {
+        if ($this->connection !== false) {
             $status = pg_ping($this->connection);
         } else {
             $status = false;
@@ -82,7 +72,7 @@ class DbHandle
     {
         if ($this->connection_is_ok()) {
             if (!pg_query($this->connection, $query)) {
-                echo "\n\n".$query."\n\n";
+                echo "\n\n" . $query . "\n\n";
                 echo pg_last_error();
                 exit("Connection not OK #Q\n");
             }
@@ -97,13 +87,13 @@ class DbHandle
     {
         $out = array();
         if ($this->connection_is_ok()) {
-            if( !($handle = pg_query($this->connection, $query) )) {
-                echo "\n\n".$query."\n\n";
+            if (!($handle = pg_query($this->connection, $query))) {
+                echo "\n\n" . $query . "\n\n";
                 echo pg_last_error();
                 exit("Connection not OK #R\n");
             } else {
                 /*echo "Ran ".$query."\n";*/
-                if(pg_num_rows($handle) > 0) {
+                if (pg_num_rows($handle) > 0) {
                     $out = pg_fetch_all($handle);
                 }
             }
@@ -116,33 +106,37 @@ class DbHandle
      * gets a list of proxies from db:
      * returns an array;
     */
-    public function getProxies($query) {
+    public function getProxies($query)
+    {
         $proxy_array = $this->getResults($query);
 
-        if(count($proxy_array) == 0) {
-            exit('Seems all proxies are blocked. Script died.'."\n");
+        if (count($proxy_array) == 0) {
+            exit('Seems all proxies are blocked. Script died.' . "\n");
         }
 
         return $proxy_array;
     }
 
     /* update proxy status by id to blocked/not <=> 1/0 */
-    public function updateProxyById($proxy_id, $new_status) {
-        $this->runQuery("UPDATE proxy set google_blocked ='".$new_status."' WHERE id = '" . $proxy_id . "'");
+    public function updateProxyById($proxy_id, $new_status)
+    {
+        $this->runQuery("UPDATE proxy set google_blocked ='" . $new_status . "' WHERE id = '" . $proxy_id . "'");
     }
 
-    public function getKeywords($query) {
+    public function getKeywords($query)
+    {
         $keywords = $this->getResults($query);
 
         if (count($keywords) == 0) {
-            echo ('No keywords to parse.'."\n");
+            echo('No keywords to parse.' . "\n");
             return $keywords;
         }
 
         return $keywords;
     }
 
-    public function getCrawledSites($query) {
+    public function getCrawledSites($query)
+    {
 
     }
 }

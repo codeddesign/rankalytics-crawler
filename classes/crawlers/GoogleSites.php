@@ -1,13 +1,15 @@
 <?php
 
-class GoogleSites
+class GoogleSites extends CrawlerBase
 {
     public $dbo, $type, $keywords, $proxy_count_file, $end_limit, $proxies, $max_results, $keywords_query, $proxy_query, $crawledDate;
 
-    function __construct($type)
+    function __construct($type, $config)
     {
+        parent::__construct($config);
+
         // init db:
-        $this->dbo = new DbHandle();
+        $this->dbo = new DbHandle($config);
 
         // set type:
         $this->type = $type;
@@ -19,7 +21,7 @@ class GoogleSites
         // settings based on type:
         switch ($this->type) {
             case 'rankalytics_crawler':
-                $this->proxy_count_file = '/var/www/stats/proxy_cs_sites.txt';
+                $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cs_sites.txt';
                 $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
 
                 $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='small_craw'" . '');
@@ -31,7 +33,7 @@ class GoogleSites
                 $this->proxy_query = "SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='small_craw' LIMIT 999999 OFFSET " . $offset;
                 break;
             default:
-                $this->proxy_count_file = '/var/www/stats/proxy_cb_sites.txt';
+                $this->proxy_count_file = $this->config['prj_path'] . '/stats/proxy_cb_sites.txt';
                 $offset = Helper::getCurrentProxyCount($this->proxy_count_file);
 
                 $r = $this->dbo->getProxies("SELECT * FROM proxy WHERE google_blocked='0' AND for_crawler='main_craw'" . '');
@@ -90,8 +92,8 @@ class GoogleSites
 
     public function getSites()
     {
-        $lang = Config::getGoogle('lang');
-        $g_tld = Config::getGoogle('tld');
+        $lang = $this->config['google_lang'];
+        $g_tld = $this->config['google_tld'];
 
         foreach ($this->keywords as $k_no => $row) {
             // sets #1:

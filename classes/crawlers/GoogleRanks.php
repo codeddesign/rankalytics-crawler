@@ -1,12 +1,14 @@
 <?php
 
-class GoogleRanks
+class GoogleRanks extends CrawlerBase
 {
     public $dbo, $proxy_query, $proxies, $sites, $final_array;
 
-    function __construct()
+    function __construct($type, $config)
     {
-        $this->dbo = new DbHandle();
+        parent::__construct($config);
+
+        $this->dbo = new DbHandle($config);
 
         // defaults:
         $this->final_array = array();
@@ -60,8 +62,8 @@ class GoogleRanks
             //reset keys of proxy array
             $this->proxies = array_values($this->proxies);
 
-            //random sleep: between 500mls & 1 second
-            usleep(rand(500, 1000));
+            //sleep 1 second:
+            sleep(1);
         }
         echo " Parsed!\n";
 

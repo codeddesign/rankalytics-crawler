@@ -1,7 +1,9 @@
 <?php
-    $file = fopen("/var/www/stats/status.txt","w");
-    fwrite($file, 0);
-    fclose($file);
+include 'auto_load.php';
 
-    echo "Crawlers will finish job then close.";
-    exit;
+$file = fopen($config['prj_path'] . "/stats/status.txt", "w");
+fwrite($file, 0);
+fclose($file);
+
+echo "Crawlers will finish job then close.";
+exit;

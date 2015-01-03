@@ -2,8 +2,7 @@
 /*if (!isset($_SESSION)) {
     session_start();
 }*/
-
-require_once '/var/www/auto_load.php';
+include __DIR__.'/../../../../../auto_load.php';
 
 /* include needed files: */
 require_once dirname(dirname(__FILE__)) . '/init.php';
