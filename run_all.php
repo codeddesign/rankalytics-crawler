@@ -37,7 +37,7 @@ while (isRunning($config) == 1) {
     $rc = new RollingCurl("crawlerCompleted");
     foreach ($crawlers as $c_no => $c_name) {
         echo "Started " . $c_name . " ..\n";
-        $query = "http://5.101.106.7/run_one.php?p=" . $c_name . "&type=" . $type;
+        $query = "http://104.236.73.120/run_one.php?p=" . $c_name . "&type=" . $type;
         $request = new RollingCurlRequest($query, "GET", null, null, null);
         $rc->add($request);
     }
