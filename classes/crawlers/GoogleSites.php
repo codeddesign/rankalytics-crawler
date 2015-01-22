@@ -187,8 +187,6 @@ class GoogleSites extends CrawlerBase
                 $final_array[$key] = '(' . implode(',', $this->rowValues($row, $key, $value, $result_array_de, $result_array_local, $news_array, $video_array, $shop_array, $this->type)) . ')';
             }
 
-            /*print_r($final_array);
-            exit;*/
             if (count($final_array) > 0) {
                 $query = "INSERT INTO crawled_sites (" . implode(',', $this->tableFields()) . ") VALUES " . implode(',', $final_array);
                 $this->dbo->runQuery($query);
@@ -258,30 +256,30 @@ class GoogleSites extends CrawlerBase
             $row['keyword'],
             $row['unique_id'],
             isset($result_array_de[$key]['rank']) ? $result_array_de[$key]['rank'] : $default,
-            isset($result_array_de[$key]['title']) ? $result_array_de[$key]['title'] : $default,
-            isset($result_array_de[$key]['desc']) ? $result_array_de[$key]['desc'] : $default,
+            isset($result_array_de[$key]['title']) ? utf8_encode($result_array_de[$key]['title']) : $default,
+            isset($result_array_de[$key]['desc']) ? utf8_encode($result_array_de[$key]['desc']) : $default,
             $value['rank'],
-            $value['title'],
-            $value['desc'],
+            utf8_encode($value['title']),
+            utf8_encode($value['desc']),
             $value['site_url'],
             isset($result_array_local[$key]['rank']) ? $result_array_local[$key]['rank'] : $default,
-            isset($result_array_local[$key]['title']) ? $result_array_local[$key]['title'] : $default,
-            isset($result_array_local[$key]['desc']) ? $result_array_local[$key]['desc'] : $default,
+            isset($result_array_local[$key]['title']) ? utf8_encode($result_array_local[$key]['title']) : $default,
+            isset($result_array_local[$key]['desc']) ? utf8_encode($result_array_local[$key]['desc']) : $default,
             isset($result_array_local[$key]['site_url']) ? $result_array_local[$key]['site_url'] : $default,
             isset($result_array_de[$key]['total_records']) ? $result_array_de[$key]['total_records'] : $default,
             $value['total_records'],
             isset($result_array_local[$key]['total_records']) ? $result_array_local[$key]['total_records'] : $default,
-            isset($news_array[$key]['title']) ? $news_array[$key]['title'] : $default,
+            isset($news_array[$key]['title']) ? utf8_encode($news_array[$key]['title']) : $default,
             isset($news_array[$key]['link']) ? $news_array[$key]['link'] : $default,
-            isset($news_array[$key]['desc']) ? $news_array[$key]['desc'] : $default,
+            isset($news_array[$key]['desc']) ? utf8_encode($news_array[$key]['desc']) : $default,
             isset($news_array[$key]['total_result']) ? $news_array[$key]['total_result'] : $default,
-            isset($video_array[$key]['title']) ? $video_array[$key]['title'] : $default,
+            isset($video_array[$key]['title']) ? utf8_encode($video_array[$key]['title']) : $default,
             isset($video_array[$key]['link']) ? $video_array[$key]['link'] : $default,
-            isset($video_array[$key]['desc']) ? $video_array[$key]['desc'] : $default,
+            isset($video_array[$key]['desc']) ? utf8_encode($video_array[$key]['desc']) : $default,
             isset($video_array[$key]['total_result']) ? $video_array[$key]['total_result'] : $default,
-            isset($shop_array[$key]['title']) ? $shop_array[$key]['title'] : $default,
+            isset($shop_array[$key]['title']) ? utf8_encode($shop_array[$key]['title']) : $default,
             isset($shop_array[$key]['link']) ? $shop_array[$key]['link'] : $default,
-            isset($shop_array[$key]['desc']) ? $shop_array[$key]['desc'] : $default,
+            isset($shop_array[$key]['desc']) ? utf8_encode($shop_array[$key]['desc']) : $default,
             isset($shop_array[$key]['price']) ? $shop_array[$key]['price'] : $default,
             isset($shop_array[$key]['image']) ? $shop_array[$key]['image'] : $default,
         );
