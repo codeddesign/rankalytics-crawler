@@ -44,4 +44,6 @@ while (isRunning($config) == 1) {
 
     $rc->execute();
     unset($rc);
+
+    sleep(1);
 }
