@@ -10,7 +10,7 @@ return array(
         "password" => "My6Celeb!!",
     ),
 
-    'google_tld' => '.com',
+    'google_tld' => 'com', // do not use dot before tld (.com)
     'google_geo' => 'us',
     'google_lang' => 'en',
 
