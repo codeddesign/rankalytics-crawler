@@ -5,7 +5,7 @@ set_time_limit(0);
 include 'auto_load.php';
 
 /* TESTS */
-if ((!isset($_GET['p']) and !isset($_GET['type'])) OR isset($argv[1])) {
+if ((isset($_GET['p']) and isset($_GET['type'])) OR isset($argv[1])) {
     if (isset($_GET['p'])) {
         $p = trim($_GET['p']);
         $type = trim($_GET['type']); // rankalytics_crawler
@@ -17,6 +17,8 @@ if ((!isset($_GET['p']) and !isset($_GET['type'])) OR isset($argv[1])) {
     exit('no work to do .. ');
 }
 
+print_r($_GET);
+die;
 while (1) {
     switch ($p) {
         case 'sites':
