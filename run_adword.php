@@ -13,7 +13,7 @@ if (!isset($project_id) or trim($project_id) == '') {
     exit('no project id provided!');
 }
 
-$t_cmd = "php " . $config['prj_path'] . "/adword_api/examples/AdWords/v201402/Optimization/NewKeywordAdowordSave.php " . $project_id . ' > /dev/null 2 &';
+$t_cmd = "php " . $config['prj_path'] . "/api/NewKeywordAdowordSave.php " . $project_id . ' > /dev/null 2 &';
 shell_exec($t_cmd);
 
 echo 'startead getting adwords info..';
