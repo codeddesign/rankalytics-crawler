@@ -3,10 +3,13 @@
 class GoogleSites extends CrawlerBase
 {
     public $dbo, $type, $keywords, $proxy_count_file, $end_limit, $proxies, $max_results, $keywords_query, $proxy_query, $crawledDate;
+    protected $defaultRowValue;
 
     function __construct($type, $config)
     {
         parent::__construct($config);
+
+        $this->defaultRowValue = '-';
 
         // init db:
         $this->dbo = new DbHandle($config);
@@ -181,6 +184,13 @@ class GoogleSites extends CrawlerBase
     function buildupAndUpdate($result_array_com, $result_array_de, $row, $news_array, $video_array, $shop_array, $result_array_local)
     {
         if (count($result_array_com) > 0) {
+            #Info Note: - switch data:
+            $result_array_de = $result_array_com;
+
+            foreach($result_array_com as $key => $value) {
+                $result_array_com[$key] = $this->defaultRowValue;
+            }
+
             //insert:
             $final_array = array();
             foreach ($result_array_com as $key => $value) {
@@ -245,7 +255,7 @@ class GoogleSites extends CrawlerBase
     // returns an array with values corresponding to tableFields (IN SAME ORDER ! ) that will be saved:
     function rowValues($row, $key, $value, $result_array_de, $result_array_local, $news_array, $video_array, $shop_array, $crawler_name)
     {
-        $default = '-';
+        $default = $this->defaultRowValue;
 
         $values = array(
             md5(time() . "-" . rand(0, 10000)), //unique_id
