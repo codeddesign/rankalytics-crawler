@@ -8,17 +8,19 @@ require_once 'functions.php';
 
 // init:
 $depth = '/../../../';
-define('SRC_PATH', dirname(__FILE__) . $depth . 'src/');
-define('LIB_PATH', 'Google/Api/Ads/AdWords/Lib');
-define('UTIL_PATH', 'Google/Api/Ads/Common/Util');
-define('ADWORDS_UTIL_PATH', 'Google/Api/Ads/AdWords/Util');
+define( 'SRC_PATH', dirname( __FILE__ ) . $depth . 'src/' );
+define( 'LIB_PATH', 'Google/Api/Ads/AdWords/Lib' );
+define( 'UTIL_PATH', 'Google/Api/Ads/Common/Util' );
+define( 'ADWORDS_UTIL_PATH', 'Google/Api/Ads/AdWords/Util' );
 
-define('ADWORDS_VERSION', 'v201409');
+define( 'ADWORDS_VERSION', 'v201409' );
 
 // Configure include path
-ini_set('include_path', implode(array(
-    ini_get('include_path'), PATH_SEPARATOR, SRC_PATH
-)));
+ini_set( 'include_path', implode( array(
+    ini_get( 'include_path' ),
+    PATH_SEPARATOR,
+    SRC_PATH
+) ) );
 
 # config:
 $config = require realpath( __DIR__ . '/../' ) . '/config.php';
