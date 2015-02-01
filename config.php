@@ -5,9 +5,9 @@ return array(
     'pg_db' => array(
         "host" => "104.236.73.122",
         "port" => 5432,
-        "dbname" => "serp",
+        "dbname" => "keyworddb",
         "user" => "phoenixkeyword",
-        "password" => "My6Celeb!!",
+        "password" => "Tatertot1",
     ),
 
     'google_tld' => 'com', // do not use dot before tld (.com)
