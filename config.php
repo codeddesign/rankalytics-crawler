@@ -3,7 +3,7 @@ return array(
     'prj_path' => __DIR__.'/',
 
     'pg_db' => array(
-        "host" => "104.236.73.122",
+        "host" => "45.56.78.107",
         "port" => 5432,
         "dbname" => "keyworddb",
         "user" => "phoenixkeyword",
