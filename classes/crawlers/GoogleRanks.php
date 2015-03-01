@@ -103,7 +103,7 @@ class GoogleRanks extends CrawlerBase
             }
         }
 
-        sleep(rand(10, 59));
+        sleep(rand(25, 59));
         echo('ranks finished.' . "\n");
     }
 

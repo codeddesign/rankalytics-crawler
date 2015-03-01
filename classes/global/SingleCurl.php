@@ -22,7 +22,7 @@ class SingleCurl
             echo '- Reset file content' . "\n";
             Helper::resetCurrentProxyCount(static::$fileName);
 
-            $sleep_time = rand(25, 59);
+            $sleep_time = rand(60*5);
             echo "- Crawler is sleeping " . $sleep_time . "s \n";
             sleep($sleep_time);
         }
@@ -73,7 +73,7 @@ class SingleCurl
                 echo "^ " . $proxy['id'] . " - " . $proxy['ip'] . " | static: " . static::$proxy_count . "\n";
 
                 //update status to blocked:
-                static::$dbo->updateProxyById($proxy['id'], '1');
+                # static::$dbo->updateProxyById($proxy['id'], '1');
 
                 //increment current used proxy to get a fresh one:
                 static::$proxy_count++;

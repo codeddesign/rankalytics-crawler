@@ -70,11 +70,6 @@ class GoogleTrends extends CrawlerBase
 
         //when we get here.. time for sleep / extra-sleep
         $sleep_time = rand( 25, 59 );
-        /*if (Helper::getCurrentProxyCount($this->proxy_count_file) == 0) {
-            $sleep_time = rand(25, 59);
-        } else {
-            $sleep_time = rand(10, 30);
-        }*/
         echo 'Crawler is sleeping ' . $sleep_time . 's .. ' . "\n";
         sleep( $sleep_time );
 
@@ -109,7 +104,7 @@ class GoogleTrends extends CrawlerBase
         }
 
         echo "Completed run.\n";
-        sleep( rand( 10, 59 ) );
+        sleep( rand( 25, 59 ) );
     }
 
     /* parses for trends: */
