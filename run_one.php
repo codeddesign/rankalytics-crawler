@@ -11,7 +11,7 @@ if ((isset($_GET['p']) and isset($_GET['type'])) OR isset($argv[1])) {
         $type = trim($_GET['type']); // rankalytics_crawler
     } else {
         $p = $argv[1];
-        $type = 'rankalytics_crawler';
+        $type = 'other_crawler';
     }
 } else {
     exit('no work to do .. ');

@@ -54,6 +54,7 @@ class SingleCurl
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_URL, $config['url']);
         curl_setopt($ch, CURLOPT_USERAGENT, $config['agent']);
+        // curl_setopt($ch, CURLOPT_FOLLOWLOCATION, TRUE);
 
         //proxy zone:
         curl_setopt($ch, CURLOPT_PROXYTYPE, 'HTTP');

@@ -184,17 +184,6 @@ class GoogleSites extends CrawlerBase
     function buildupAndUpdate($result_array_com, $result_array_de, $row, $news_array, $video_array, $shop_array, $result_array_local)
     {
         if (count($result_array_com) > 0) {
-            #Info Note: - switch data:
-            $result_array_de = $result_array_com;
-
-            $result_array_com = array(
-                'total_records' => $this->defaultRowValue,
-                'rank'          => $this->defaultRowValue,
-                'title'         => $this->defaultRowValue,
-                'desc'          => $this->defaultRowValue,
-                'site_url'      => $this->defaultRowValue,
-            );
-
             //insert:
             $final_array = array();
             foreach ($result_array_com as $key => $value) {
@@ -256,6 +245,38 @@ class GoogleSites extends CrawlerBase
         return $fields;
     }
 
+    /**
+     * @param $link
+     *
+     * @return bool
+     */
+    public function linkHasScheme($link)
+    {
+        return (strtolower(substr($link, 0, 4)) === 'http');
+    }
+
+    /**
+     * @param $url
+     * @return mixed
+     */
+    public function getHost($url)
+    {
+        $url = trim($url);
+
+        // parse_url() won't work properly if 'http' is missing:
+        if (!$this->linkHasScheme($url)) {
+            $url = 'http://' . $url;
+        }
+
+        $parts = parse_url($url);
+        if (isset($parts["host"])) {
+            return str_ireplace("www.", "", $parts["host"]);
+        }
+
+        // this should never happen:
+        return $this->defaultRowValue;
+    }
+
     // returns an array with values corresponding to tableFields (IN SAME ORDER ! ) that will be saved:
     function rowValues($row, $key, $value, $result_array_de, $result_array_local, $news_array, $video_array, $shop_array, $crawler_name)
     {
@@ -264,7 +285,7 @@ class GoogleSites extends CrawlerBase
         $values = array(
             md5(time() . "-" . rand(0, 10000)), //unique_id
             isset($result_array_de[$key]['site_url']) ? $result_array_de[$key]['site_url'] : $default,
-            isset($result_array_de[$key]['site_url']) ? str_replace(array("https://", "http://"), "", rtrim($result_array_de[$key]['site_url'], "/")) : $default,
+            isset($value['site_url']) ? $this->getHost($value['site_url']): $default,
             $crawler_name,
             $this->crawledDate,
             $row['keyword'],
@@ -272,16 +293,16 @@ class GoogleSites extends CrawlerBase
             isset($result_array_de[$key]['rank']) ? $result_array_de[$key]['rank'] : $default,
             isset($result_array_de[$key]['title']) ? utf8_encode($result_array_de[$key]['title']) : $default,
             isset($result_array_de[$key]['desc']) ? utf8_encode($result_array_de[$key]['desc']) : $default,
-            $value['rank'],
-            utf8_encode($value['title']),
-            utf8_encode($value['desc']),
-            $value['site_url'],
+            isset($value['rank']) ? $value['rank'] : $default,
+            isset($value['title']) ? utf8_encode($value['title']) : $default,
+            isset($value['desc']) ? utf8_encode($value['desc']) : $default,
+            isset($value['site_url']) ? $value['site_url'] : $default,
             isset($result_array_local[$key]['rank']) ? $result_array_local[$key]['rank'] : $default,
             isset($result_array_local[$key]['title']) ? utf8_encode($result_array_local[$key]['title']) : $default,
             isset($result_array_local[$key]['desc']) ? utf8_encode($result_array_local[$key]['desc']) : $default,
             isset($result_array_local[$key]['site_url']) ? $result_array_local[$key]['site_url'] : $default,
             isset($result_array_de[$key]['total_records']) ? $result_array_de[$key]['total_records'] : $default,
-            $value['total_records'],
+            isset($value['total_records']) ? $value['total_records'] : $default,
             isset($result_array_local[$key]['total_records']) ? $result_array_local[$key]['total_records'] : $default,
             isset($news_array[$key]['title']) ? utf8_encode($news_array[$key]['title']) : $default,
             isset($news_array[$key]['link']) ? $news_array[$key]['link'] : $default,
