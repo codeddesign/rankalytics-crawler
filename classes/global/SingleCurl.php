@@ -22,7 +22,7 @@ class SingleCurl
             echo '- Reset file content' . "\n";
             Helper::resetCurrentProxyCount(static::$fileName);
 
-            $sleep_time = rand(60*5);
+            $sleep_time = 60*5;
             echo "- Crawler is sleeping " . $sleep_time . "s \n";
             sleep($sleep_time);
         }
